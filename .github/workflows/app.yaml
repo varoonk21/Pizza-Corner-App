@@ -12,7 +12,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: flutter_app
+        working-directory: Pizza-Corner-master
 
     steps:
       - name: Checkout repository
