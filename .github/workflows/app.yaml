@@ -12,7 +12,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: Pizza-Corner-master
+        working-directory: flutter_app
 
     steps:
       - name: Checkout repository
@@ -33,6 +33,12 @@ jobs:
           key: ${{ runner.os }}-pub-${{ hashFiles('flutter_app/pubspec.lock') }}
           restore-keys: |
             ${{ runner.os }}-pub-
+
+      # ✅ Add this step to install required Android SDK components and accept licenses
+      - name: Accept Android Licenses
+        run: |
+          yes | sudo ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --licenses
+          sudo ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager "ndk;29.0.13599879" "platforms;android-34"
 
       - name: Install dependencies
         run: flutter pub get
