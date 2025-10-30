@@ -30,25 +30,36 @@ jobs:
           path: |
             ~/.pub-cache
             ~/.dart-tool
-          key: ${{ runner.os }}-pub-${{ hashFiles('flutter_app/pubspec.lock') }}
+          key: ${{ runner.os }}-pub-${{ hashFiles('Pizza-Corner-master/pubspec.lock') }}
           restore-keys: |
             ${{ runner.os }}-pub-
 
-      # ✅ Add this step to install required Android SDK components and accept licenses
+      # ✅ Accept SDK licenses & install missing components
       - name: Accept Android Licenses
         run: |
           yes | sudo ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --licenses
           sudo ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager "ndk;29.0.13599879" "platforms;android-34"
-          
+
+      # ✅ Fix Android keystore permission issue
       - name: Fix Android keystore permissions
         run: |
           mkdir -p ~/.android
           chmod 777 ~/.android
-    
+          export ANDROID_SDK_HOME=$HOME
+          export ANDROID_PREFS_ROOT=$HOME/.android
+          export ANDROID_EMULATOR_HOME=$HOME/.android
+          export ANDROID_AVD_HOME=$HOME/.android/avd
+
+      # ✅ Set environment variable for keystore path (important)
+      - name: Set up Gradle environment
+        run: echo "export ANDROID_SDK_HOME=$HOME/.android" >> $GITHUB_ENV
+
       - name: Install dependencies
         run: flutter pub get
 
       - name: Build release APK
+        env:
+          ANDROID_SDK_HOME: ${{ env.HOME }}/.android
         run: flutter build apk --release
 
       - name: Upload APK artifact
